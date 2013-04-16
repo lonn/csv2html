@@ -1,26 +1,29 @@
-from sys import argv
-import csv
+import os, sys, csv
 
-script, filename = argv
-table = ""
+nargs = len(sys.argv)
+if not 2 <= nargs <= 3:
+	print "usage: %s infile [outfile]" % os.path.basename(sys.argv[0])
+else:
+	input_file = sys.argv[1]
+	# print in screen as default
+	output_file = sys.stdout
 
-#open .csv file
-with open(filename, 'rb') as csvfile:
-	reader = csv.reader(csvfile)
-	
-	#generate table
-	table += "<table border='1'>"
+	table = ""
+	with open(input_file, 'rb') as csvfile:
+		reader = csv.reader(csvfile)
 
-	#get every row in .csv
-	for row in reader:
-		#get every item in row
-		table += "<tr>\n" + "".join(["<td>%s</td>\n" % item for item in row]) + "</tr>\n"
+		table += "<table border='1'>\n"
+		for row in reader:
+			table += "<tr>\n" + "".join(["<td>%s</td>\n" % 
+				     item for item in row]) + "</tr>\n"
+		table += "</table>\n"
 
-	table += "</table>"
+	# print to file if it's given
+	if nargs > 2:
+		with open(sys.argv[2], 'w') as htmlfile:
+			htmlfile.write(table)
 
-#write to .html
-tofile = filename + ".html"
-with open(tofile, 'w+') as htmlfile:
-	htmlfile.write(table)
-
-print "All done.."
+		print "All done.. Printed to %s." % sys.argv[2]
+	else:
+		output_file.write(table)
+		output_file.close()
